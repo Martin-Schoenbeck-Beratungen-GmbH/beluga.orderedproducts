@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Reordered Products
+Bundle-SymbolicName: beluga.orderedproducts
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: beluga.orderedproducts
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Service-Component: OSGI-INF/*.xml
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
+Require-Bundle: org.adempiere.base;bundle-version="9.0.0",
+ org.adempiere.plugin.utils;bundle-version="9.0.0",
+ org.adempiere.ui.zk;bundle-version="9.0.0"
+Export-Package: de.schoenbeck.beluga.orderedproducts
