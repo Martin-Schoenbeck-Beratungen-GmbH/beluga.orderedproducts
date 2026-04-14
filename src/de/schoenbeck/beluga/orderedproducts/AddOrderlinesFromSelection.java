@@ -3,7 +3,9 @@ package de.schoenbeck.beluga.orderedproducts;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
@@ -84,6 +86,8 @@ public class AddOrderlinesFromSelection extends SvrProcess {
 			DB.close(rs, ps);
 		}
 		
+		rtn.sort( (arg0, arg1) -> arg0.getLine() - arg1.getLine() );
+		
 		return rtn;
 	}
 	
@@ -91,5 +95,34 @@ public class AddOrderlinesFromSelection extends SvrProcess {
 		int m_product_id;
 		BigDecimal qty;
 		BigDecimal price;
+		private int _line = -1;
+		
+		int getLine() {
+			if (_line == -1) {
+				final String sql = """
+						SELECT Line
+						FROM blg_orderedproducts_v
+						WHERE M_Product_ID=?
+						AND C_BPartner_ID=?
+						AND M_PriceList_ID=?
+						FETCH FIRST 1 ROW ONLY
+						""";
+				var ps = DB.prepareStatement(sql, get_TrxName());
+				ResultSet rs = null;
+				try {
+					ps.setInt(1, m_product_id);
+					ps.setInt(2, record.getC_BPartner_ID());
+					ps.setInt(3, record.getM_PriceList_ID());
+					rs = ps.executeQuery();
+					if (rs.next())
+						_line = rs.getInt(1);
+				} catch (SQLException e) {
+					log.log(Level.SEVERE, "SQL Failure", e);
+				} finally {
+					DB.close(rs, ps);
+				}
+			}
+			return _line;
+		}
 	};
 }
